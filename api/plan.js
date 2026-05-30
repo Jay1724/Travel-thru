@@ -12,25 +12,20 @@ export default async function handler(req, res) {
   const dateContext =
     dateFrom && dateTo ? ` from ${dateFrom} to ${dateTo}` : "";
 
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [
-          {
-            role: "user",
-            content: `You are a South African travel planner. Build a ${days}-day itinerary for ${pax} traveller(s) visiting ${destination}${dateContext}. Respond ONLY with valid JSON, no markdown, no preamble. Schema:
+  const prompt = `You are a South African travel planner. Build a ${days}-day itinerary for ${pax} traveller(s) visiting ${destination}${dateContext}. Respond ONLY with valid JSON, no markdown, no preamble. Schema:
 {"summary":"one vivid sentence","days":[{"day":1,"title":"short title","items":[{"time":"Morning","activity":"name","note":"1 short tip"}]}]}
-Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be specific to ${destination}.`,
-          },
-        ],
+Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be specific to ${destination}.`;
+
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 1200, temperature: 0.7 },
       }),
     });
 
@@ -38,14 +33,11 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
       const err = await response.json().catch(() => ({}));
       return res
         .status(response.status)
-        .json({ error: err.error?.message || "Anthropic API error" });
+        .json({ error: err.error?.message || "Gemini API error" });
     }
 
     const data = await response.json();
-    const text = data.content
-      .filter((b) => b.type === "text")
-      .map((b) => b.text)
-      .join("");
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const itinerary = JSON.parse(text.replace(/```json|```/g, "").trim());
     res.json(itinerary);
   } catch (e) {
