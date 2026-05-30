@@ -1,21 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Plane, BedDouble, Car, MapPin, Calendar, Users,
   Sparkles, ArrowRight, Loader2, Clock, Star,
-  ChevronRight, Wallet,
+  ChevronRight, Wallet, X,
 } from "lucide-react";
+import { DayPicker } from "react-day-picker";
+import { format, differenceInCalendarDays, addDays } from "date-fns";
+import "react-day-picker/style.css";
 
 // ─────────────────────────────────────────────────────────────
 // WanderZA — AI trip planner MVP
-// Destination-first flow → AI itinerary engine (Anthropic API)
-// + structured mock booking results (swap for Duffel / Booking
-//   affiliate / TripAdvisor APIs at the marked integration points)
 // ─────────────────────────────────────────────────────────────
 
 const ZAR = (n) => "R" + n.toLocaleString("en-ZA");
 
-// --- MOCK DATA LAYER -------------------------------------------------
-// Replace each generator with a real API call.
+const fmt = (d) => format(d, "d MMM");
+const fmtFull = (d) => format(d, "d MMM yyyy");
+
 function mockFlights(destination, pax) {
   const base = 1450 + (destination.length * 37) % 900;
   return [
@@ -42,16 +43,40 @@ function mockCars(destination) {
 }
 
 const SUGGESTIONS = ["Cape Town", "Durban", "Mauritius", "Zanzibar", "Plettenberg Bay", "Kruger"];
+const today = new Date();
+today.setHours(0, 0, 0, 0);
 
 export default function App() {
-  const [stage, setStage] = useState("ask"); // ask → planning → results
+  const [stage, setStage] = useState("ask");
   const [destination, setDestination] = useState("");
-  const [days, setDays] = useState(4);
+  const [dateRange, setDateRange] = useState({ from: undefined, to: undefined });
+  const [showCal, setShowCal] = useState(false);
   const [pax, setPax] = useState(2);
   const [itinerary, setItinerary] = useState(null);
   const [error, setError] = useState("");
   const [tab, setTab] = useState("itinerary");
   const [picks, setPicks] = useState({ flight: "f1", stay: "s1", car: "c1" });
+  const calRef = useRef(null);
+
+  const days = dateRange.from && dateRange.to
+    ? Math.max(1, differenceInCalendarDays(dateRange.to, dateRange.from))
+    : 0;
+
+  const dateLabel = dateRange.from && dateRange.to
+    ? `${fmt(dateRange.from)} – ${fmt(dateRange.to)}`
+    : null;
+
+  const canPlan = destination.trim() && dateRange.from && dateRange.to;
+
+  // Close calendar on outside click
+  useEffect(() => {
+    if (!showCal) return;
+    function handler(e) {
+      if (calRef.current && !calRef.current.contains(e.target)) setShowCal(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showCal]);
 
   const flights = destination ? mockFlights(destination, pax) : [];
   const stays = destination ? mockStays(destination) : [];
@@ -63,8 +88,14 @@ export default function App() {
   const tripTotal =
     (flight?.total || 0) + (stay ? stay.night * days : 0) + (car ? car.day * days : 0);
 
+  function resetTrip() {
+    setStage("ask");
+    setItinerary(null);
+    setDateRange({ from: undefined, to: undefined });
+  }
+
   async function plan() {
-    if (!destination.trim()) return;
+    if (!canPlan) return;
     setStage("planning");
     setError("");
     try {
@@ -77,7 +108,7 @@ export default function App() {
           messages: [
             {
               role: "user",
-              content: `You are a South African travel planner. Build a ${days}-day itinerary for ${pax} traveller(s) visiting ${destination}. Respond ONLY with valid JSON, no markdown, no preamble. Schema:
+              content: `You are a South African travel planner. Build a ${days}-day itinerary for ${pax} traveller(s) visiting ${destination} from ${fmtFull(dateRange.from)} to ${fmtFull(dateRange.to)}. Respond ONLY with valid JSON, no markdown, no preamble. Schema:
 {"summary":"one vivid sentence","days":[{"day":1,"title":"short title","items":[{"time":"Morning","activity":"name","note":"1 short tip"}]}]}
 Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be specific to ${destination}.`,
             },
@@ -110,10 +141,7 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
           </span>
         </div>
         {stage === "results" && (
-          <button
-            onClick={() => { setStage("ask"); setItinerary(null); }}
-            className="text-sm text-white/50 hover:text-white"
-          >
+          <button onClick={resetTrip} className="text-sm text-white/50 hover:text-white">
             Start over
           </button>
         )}
@@ -127,6 +155,7 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
             Where do you<br />want to go?
           </h1>
 
+          {/* Destination input */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-2 flex items-center gap-2 mb-4 focus-within:border-amber-400/60 transition">
             <MapPin size={20} className="ml-3 text-amber-400 shrink-0" />
             <input
@@ -139,6 +168,7 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
             />
           </div>
 
+          {/* Suggestions */}
           <div className="flex flex-wrap gap-2 justify-center mb-8">
             {SUGGESTIONS.map((s) => (
               <button
@@ -155,18 +185,58 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
             ))}
           </div>
 
-          <div className="flex gap-3 justify-center mb-8">
-            <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3">
-              <Calendar size={18} className="text-amber-400" />
-              <div className="text-left">
-                <div className="text-[11px] text-white/40 uppercase tracking-wide">Days</div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => setDays(Math.max(1, days - 1))} className="w-5 h-5 rounded bg-white/10 leading-none">−</button>
-                  <span className="w-5 text-center font-semibold">{days}</span>
-                  <button onClick={() => setDays(days + 1)} className="w-5 h-5 rounded bg-white/10 leading-none">+</button>
+          {/* Controls row */}
+          <div className="flex gap-3 justify-center flex-wrap mb-8">
+
+            {/* Date range picker */}
+            <div ref={calRef} className="relative">
+              <button
+                onClick={() => setShowCal((v) => !v)}
+                className={`bg-white/5 border rounded-xl px-4 py-3 flex items-center gap-3 transition hover:border-white/30 ${
+                  showCal ? "border-amber-400/60" : "border-white/10"
+                }`}
+              >
+                <Calendar size={18} className="text-amber-400 shrink-0" />
+                <div className="text-left">
+                  <div className="text-[11px] text-white/40 uppercase tracking-wide">Dates</div>
+                  <div className={`text-sm font-semibold ${dateLabel ? "" : "text-white/40"}`}>
+                    {dateLabel ?? "Pick dates"}
+                    {days > 0 && (
+                      <span className="ml-1.5 text-amber-400/80 font-normal text-xs">
+                        · {days}d
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
+                {dateLabel && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setDateRange({ from: undefined, to: undefined }); }}
+                    className="ml-1 text-white/30 hover:text-white/70"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </button>
+
+              {showCal && (
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 wanderza-cal bg-[#182316] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                  <DayPicker
+                    mode="range"
+                    selected={dateRange}
+                    onSelect={(range) => {
+                      setDateRange(range ?? { from: undefined, to: undefined });
+                      if (range?.from && range?.to) setShowCal(false);
+                    }}
+                    disabled={{ before: today }}
+                    defaultMonth={today}
+                    numberOfMonths={2}
+                    showOutsideDays={false}
+                  />
+                </div>
+              )}
             </div>
+
+            {/* Travellers stepper */}
             <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3">
               <Users size={18} className="text-amber-400" />
               <div className="text-left">
@@ -182,7 +252,7 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
 
           <button
             onClick={plan}
-            disabled={!destination.trim()}
+            disabled={!canPlan}
             className="group inline-flex items-center gap-2 bg-amber-400 disabled:opacity-30 text-[#0c1410] font-semibold px-8 py-4 rounded-full hover:bg-amber-300 transition"
           >
             <Sparkles size={18} /> Plan my trip
@@ -199,7 +269,9 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
           <h2 style={{ fontFamily: "'Fraunces', serif" }} className="text-3xl font-bold mb-2">
             Designing your {destination} trip…
           </h2>
-          <p className="text-white/50">Mapping {days} days · sourcing flights, stays & cars</p>
+          <p className="text-white/50">
+            {dateLabel} · {days} days · sourcing flights, stays & cars
+          </p>
         </div>
       )}
 
@@ -229,29 +301,37 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
                   "{itinerary.summary}"
                 </p>
                 <div className="space-y-5">
-                  {itinerary.days.map((d) => (
-                    <div key={d.day} className="bg-white/5 border border-white/10 rounded-2xl p-5">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="w-8 h-8 rounded-full bg-amber-400 text-[#0c1410] grid place-items-center font-bold text-sm">
-                          {d.day}
-                        </span>
-                        <h3 className="font-semibold text-lg">{d.title}</h3>
-                      </div>
-                      <div className="space-y-3">
-                        {d.items.map((it, i) => (
-                          <div key={i} className="flex gap-3 pl-2">
-                            <div className="text-xs text-amber-400/80 w-16 shrink-0 pt-0.5 flex items-center gap-1">
-                              <Clock size={11} />{it.time}
-                            </div>
-                            <div>
-                              <div className="font-medium text-sm">{it.activity}</div>
-                              <div className="text-white/40 text-xs">{it.note}</div>
-                            </div>
+                  {itinerary.days.map((d, idx) => {
+                    const dayDate = dateRange.from ? addDays(dateRange.from, idx) : null;
+                    return (
+                      <div key={d.day} className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="w-8 h-8 rounded-full bg-amber-400 text-[#0c1410] grid place-items-center font-bold text-sm">
+                            {d.day}
+                          </span>
+                          <div>
+                            <h3 className="font-semibold text-lg leading-tight">{d.title}</h3>
+                            {dayDate && (
+                              <p className="text-xs text-white/40">{format(dayDate, "EEEE, d MMM")}</p>
+                            )}
                           </div>
-                        ))}
+                        </div>
+                        <div className="space-y-3">
+                          {d.items.map((it, i) => (
+                            <div key={i} className="flex gap-3 pl-2">
+                              <div className="text-xs text-amber-400/80 w-16 shrink-0 pt-0.5 flex items-center gap-1">
+                                <Clock size={11} />{it.time}
+                              </div>
+                              <div>
+                                <div className="font-medium text-sm">{it.activity}</div>
+                                <div className="text-white/40 text-xs">{it.note}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -341,7 +421,10 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
           {/* Booking summary rail */}
           <aside className="lg:sticky lg:top-6 h-fit bg-white/5 border border-white/10 rounded-2xl p-5">
             <h3 style={{ fontFamily: "'Fraunces', serif" }} className="text-xl font-bold mb-1">{destination}</h3>
-            <p className="text-white/40 text-sm mb-5">{days} days · {pax} travellers</p>
+            <div className="text-white/40 text-sm mb-5 space-y-0.5">
+              {dateLabel && <p>{dateLabel}</p>}
+              <p>{days} nights · {pax} traveller{pax !== 1 ? "s" : ""}</p>
+            </div>
             <div className="space-y-3 text-sm">
               <Row icon={<Plane size={15} />} label={flight?.airline} val={ZAR(flight?.total || 0)} />
               <Row icon={<BedDouble size={15} />} label={`${stay?.name} ×${days}`} val={ZAR((stay?.night || 0) * days)} />

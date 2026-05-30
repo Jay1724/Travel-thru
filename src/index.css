@@ -8,3 +8,90 @@ body {
   width: 100%;
   min-height: 100svh;
 }
+
+/* ── react-day-picker dark theme for WanderZA ── */
+.wanderza-cal {
+  --rdp-accent-color: #fbbf24;
+  --rdp-accent-background-color: rgba(251, 191, 36, 0.18);
+  --rdp-day-height: 36px;
+  --rdp-day-width: 36px;
+  --rdp-day_button-height: 36px;
+  --rdp-day_button-width: 36px;
+  --rdp-day_button-border-radius: 8px;
+  --rdp-selected-border: none;
+  --rdp-range_middle-background-color: rgba(251, 191, 36, 0.12);
+  --rdp-range_start-background: #fbbf24;
+  --rdp-range_end-background: #fbbf24;
+  color: #f4f1e8;
+  font-family: "Outfit", sans-serif;
+  font-size: 13px;
+}
+
+.wanderza-cal .rdp-month_caption {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f4f1e8;
+  padding-bottom: 8px;
+}
+
+.wanderza-cal .rdp-weekday {
+  color: rgba(244, 241, 232, 0.35);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wanderza-cal .rdp-day_button {
+  color: #f4f1e8;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.wanderza-cal .rdp-day_button:hover:not([disabled]) {
+  background: rgba(251, 191, 36, 0.25);
+  color: #fbbf24;
+}
+
+.wanderza-cal .rdp-day--outside .rdp-day_button {
+  color: rgba(244, 241, 232, 0.2);
+}
+
+.wanderza-cal .rdp-day--disabled .rdp-day_button {
+  color: rgba(244, 241, 232, 0.2);
+  cursor: not-allowed;
+}
+
+.wanderza-cal .rdp-day--selected .rdp-day_button,
+.wanderza-cal .rdp-day--range_start .rdp-day_button,
+.wanderza-cal .rdp-day--range_end .rdp-day_button {
+  background: #fbbf24;
+  color: #0c1410;
+  font-weight: 700;
+}
+
+.wanderza-cal .rdp-day--range_middle .rdp-day_button {
+  background: rgba(251, 191, 36, 0.12);
+  color: #f4f1e8;
+  border-radius: 0;
+}
+
+.wanderza-cal .rdp-nav button {
+  color: rgba(244, 241, 232, 0.5);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.wanderza-cal .rdp-nav button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f4f1e8;
+}
+
+.wanderza-cal .rdp-months {
+  gap: 24px;
+}
