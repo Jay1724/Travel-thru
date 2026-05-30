@@ -10,21 +10,31 @@ body {
 }
 
 /* ── react-day-picker dark theme for WanderZA ── */
-.wanderza-cal {
+/* RDP v9 re-declares its CSS vars on .rdp-root, so override them there. */
+.wanderza-cal,
+.wanderza-cal .rdp-root {
   --rdp-accent-color: #fbbf24;
-  --rdp-accent-background-color: rgba(251, 191, 36, 0.18);
+  --rdp-accent-background-color: rgba(251, 191, 36, 0.15);
   --rdp-day-height: 36px;
   --rdp-day-width: 36px;
   --rdp-day_button-height: 36px;
   --rdp-day_button-width: 36px;
   --rdp-day_button-border-radius: 8px;
-  --rdp-selected-border: none;
+  --rdp-selected-border: 2px solid #fbbf24;
   --rdp-range_middle-background-color: rgba(251, 191, 36, 0.12);
   --rdp-range_start-background: #fbbf24;
   --rdp-range_end-background: #fbbf24;
+}
+
+.wanderza-cal {
   color: #f4f1e8;
   font-family: "Outfit", sans-serif;
   font-size: 13px;
+}
+
+.wanderza-cal .rdp-day_button:focus-visible {
+  outline: 2px solid #fbbf24;
+  outline-offset: 1px;
 }
 
 .wanderza-cal .rdp-month_caption {
@@ -54,27 +64,32 @@ body {
   color: #fbbf24;
 }
 
-.wanderza-cal .rdp-day--outside .rdp-day_button {
+.wanderza-cal .rdp-outside .rdp-day_button {
   color: rgba(244, 241, 232, 0.2);
 }
 
-.wanderza-cal .rdp-day--disabled .rdp-day_button {
+.wanderza-cal .rdp-disabled .rdp-day_button {
   color: rgba(244, 241, 232, 0.2);
   cursor: not-allowed;
 }
 
-.wanderza-cal .rdp-day--selected .rdp-day_button,
-.wanderza-cal .rdp-day--range_start .rdp-day_button,
-.wanderza-cal .rdp-day--range_end .rdp-day_button {
+.wanderza-cal .rdp-selected .rdp-day_button,
+.wanderza-cal .rdp-range_start .rdp-day_button,
+.wanderza-cal .rdp-range_end .rdp-day_button {
   background: #fbbf24;
   color: #0c1410;
   font-weight: 700;
 }
 
-.wanderza-cal .rdp-day--range_middle .rdp-day_button {
+.wanderza-cal .rdp-range_middle .rdp-day_button {
   background: rgba(251, 191, 36, 0.12);
   color: #f4f1e8;
   border-radius: 0;
+}
+
+.wanderza-cal .rdp-range_middle .rdp-day_button:hover {
+  background: rgba(251, 191, 36, 0.28);
+  color: #fbbf24;
 }
 
 .wanderza-cal .rdp-nav button {
@@ -92,6 +107,23 @@ body {
   color: #f4f1e8;
 }
 
+.wanderza-cal .rdp-chevron {
+  fill: rgba(244, 241, 232, 0.6);
+}
+
+.wanderza-cal .rdp-nav button:hover .rdp-chevron {
+  fill: #fbbf24;
+}
+
 .wanderza-cal .rdp-months {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   gap: 24px;
+}
+
+@media (max-width: 640px) {
+  .wanderza-cal .rdp-months {
+    flex-direction: column;
+  }
 }

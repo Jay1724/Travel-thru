@@ -190,33 +190,40 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
 
             {/* Date range picker */}
             <div ref={calRef} className="relative">
-              <button
-                onClick={() => setShowCal((v) => !v)}
+              <div
                 className={`bg-white/5 border rounded-xl px-4 py-3 flex items-center gap-3 transition hover:border-white/30 ${
                   showCal ? "border-amber-400/60" : "border-white/10"
                 }`}
               >
-                <Calendar size={18} className="text-amber-400 shrink-0" />
-                <div className="text-left">
-                  <div className="text-[11px] text-white/40 uppercase tracking-wide">Dates</div>
-                  <div className={`text-sm font-semibold ${dateLabel ? "" : "text-white/40"}`}>
-                    {dateLabel ?? "Pick dates"}
-                    {days > 0 && (
-                      <span className="ml-1.5 text-amber-400/80 font-normal text-xs">
-                        · {days}d
-                      </span>
-                    )}
+                <button
+                  type="button"
+                  onClick={() => setShowCal((v) => !v)}
+                  className="flex items-center gap-3 text-left"
+                >
+                  <Calendar size={18} className="text-amber-400 shrink-0" />
+                  <div>
+                    <div className="text-[11px] text-white/40 uppercase tracking-wide">Dates</div>
+                    <div className={`text-sm font-semibold ${dateLabel ? "" : "text-white/40"}`}>
+                      {dateLabel ?? "Pick dates"}
+                      {days > 0 && (
+                        <span className="ml-1.5 text-amber-400/80 font-normal text-xs">
+                          · {days}d
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </button>
                 {dateLabel && (
                   <button
-                    onClick={(e) => { e.stopPropagation(); setDateRange({ from: undefined, to: undefined }); }}
+                    type="button"
+                    onClick={() => setDateRange({ from: undefined, to: undefined })}
                     className="ml-1 text-white/30 hover:text-white/70"
+                    aria-label="Clear dates"
                   >
                     <X size={14} />
                   </button>
                 )}
-              </button>
+              </div>
 
               {showCal && (
                 <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 wanderza-cal bg-[#182316] border border-white/10 rounded-2xl p-4 shadow-2xl">
@@ -225,7 +232,11 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
                     selected={dateRange}
                     onSelect={(range) => {
                       setDateRange(range ?? { from: undefined, to: undefined });
-                      if (range?.from && range?.to) setShowCal(false);
+                      // Range mode sets from===to on the first click; only
+                      // auto-close once a genuine multi-night range is picked.
+                      if (range?.from && range?.to && range.from.getTime() !== range.to.getTime()) {
+                        setShowCal(false);
+                      }
                     }}
                     disabled={{ before: today }}
                     defaultMonth={today}
