@@ -1,16 +1,52 @@
-# React + Vite
+# Travel Thru
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Plan it once. Book it all.** Travel Thru is an AI trip planner: pick a
+destination and your exact travel dates, and it generates a day-by-day
+itinerary alongside flights, stays, and car-hire options — with a live
+running total in ZAR.
 
-Currently, two official plugins are available:
+Built with **React + Vite**, **Tailwind CSS v4**, **react-day-picker**, and
+the **Anthropic API** for the itinerary engine.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Local development
 
-## React Compiler
+```bash
+npm install
+npm run dev      # http://localhost:5173
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Other scripts:
 
-## Expanding the ESLint configuration
+```bash
+npm run build    # production build → dist/
+npm run preview  # preview the production build locally
+npm run lint     # eslint
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Deployment (GitHub Pages)
+
+The repo ships a GitHub Actions workflow (`.github/workflows/deploy.yml`)
+that builds the app and publishes `dist/` to GitHub Pages on every push.
+
+**One-time setup** (in the GitHub UI — these can't be scripted):
+
+1. Go to **Settings → Pages**.
+2. Under **Build and deployment → Source**, choose **GitHub Actions**.
+3. If deploying from a non-default branch, allow it under
+   **Settings → Environments → github-pages → Deployment branches**.
+
+Once enabled, the workflow runs automatically and the live URL appears in
+the Actions run summary (typically `https://jay1724.github.io/Travel-thru/`).
+
+The Vite build uses a **relative base path** (`base: './'`), so the bundle
+works from any subpath without further configuration.
+
+## Notes
+
+- The itinerary engine calls the Anthropic API directly from the browser.
+  For a public deployment this needs an API key and a server-side proxy —
+  exposing a key in client code is insecure and won't work cross-origin.
+  Wire the call through a small backend (or serverless function) before
+  going live. The booking data (flights, stays, cars) is currently mocked;
+  swap the `mock*` generators in `src/App.jsx` for real APIs (Duffel,
+  Booking.com, etc.) at the marked integration points.

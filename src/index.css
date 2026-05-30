@@ -9,10 +9,10 @@ body {
   min-height: 100svh;
 }
 
-/* ── react-day-picker dark theme for WanderZA ── */
+/* ── react-day-picker dark theme for Travel Thru ── */
 /* RDP v9 re-declares its CSS vars on .rdp-root, so override them there. */
-.wanderza-cal,
-.wanderza-cal .rdp-root {
+.travelthru-cal,
+.travelthru-cal .rdp-root {
   --rdp-accent-color: #fbbf24;
   --rdp-accent-background-color: rgba(251, 191, 36, 0.15);
   --rdp-day-height: 36px;
@@ -26,25 +26,25 @@ body {
   --rdp-range_end-background: #fbbf24;
 }
 
-.wanderza-cal {
+.travelthru-cal {
   color: #f4f1e8;
   font-family: "Outfit", sans-serif;
   font-size: 13px;
 }
 
-.wanderza-cal .rdp-day_button:focus-visible {
+.travelthru-cal .rdp-day_button:focus-visible {
   outline: 2px solid #fbbf24;
   outline-offset: 1px;
 }
 
-.wanderza-cal .rdp-month_caption {
+.travelthru-cal .rdp-month_caption {
   font-size: 14px;
   font-weight: 600;
   color: #f4f1e8;
   padding-bottom: 8px;
 }
 
-.wanderza-cal .rdp-weekday {
+.travelthru-cal .rdp-weekday {
   color: rgba(244, 241, 232, 0.35);
   font-size: 11px;
   font-weight: 500;
@@ -52,47 +52,47 @@ body {
   letter-spacing: 0.05em;
 }
 
-.wanderza-cal .rdp-day_button {
+.travelthru-cal .rdp-day_button {
   color: #f4f1e8;
   border: none;
   cursor: pointer;
   transition: background 0.15s;
 }
 
-.wanderza-cal .rdp-day_button:hover:not([disabled]) {
+.travelthru-cal .rdp-day_button:hover:not([disabled]) {
   background: rgba(251, 191, 36, 0.25);
   color: #fbbf24;
 }
 
-.wanderza-cal .rdp-outside .rdp-day_button {
+.travelthru-cal .rdp-outside .rdp-day_button {
   color: rgba(244, 241, 232, 0.2);
 }
 
-.wanderza-cal .rdp-disabled .rdp-day_button {
+.travelthru-cal .rdp-disabled .rdp-day_button {
   color: rgba(244, 241, 232, 0.2);
   cursor: not-allowed;
 }
 
-.wanderza-cal .rdp-selected .rdp-day_button,
-.wanderza-cal .rdp-range_start .rdp-day_button,
-.wanderza-cal .rdp-range_end .rdp-day_button {
+.travelthru-cal .rdp-selected .rdp-day_button,
+.travelthru-cal .rdp-range_start .rdp-day_button,
+.travelthru-cal .rdp-range_end .rdp-day_button {
   background: #fbbf24;
   color: #0c1410;
   font-weight: 700;
 }
 
-.wanderza-cal .rdp-range_middle .rdp-day_button {
+.travelthru-cal .rdp-range_middle .rdp-day_button {
   background: rgba(251, 191, 36, 0.12);
   color: #f4f1e8;
   border-radius: 0;
 }
 
-.wanderza-cal .rdp-range_middle .rdp-day_button:hover {
+.travelthru-cal .rdp-range_middle .rdp-day_button:hover {
   background: rgba(251, 191, 36, 0.28);
   color: #fbbf24;
 }
 
-.wanderza-cal .rdp-nav button {
+.travelthru-cal .rdp-nav button {
   color: rgba(244, 241, 232, 0.5);
   background: transparent;
   border: none;
@@ -102,20 +102,20 @@ body {
   transition: background 0.15s, color 0.15s;
 }
 
-.wanderza-cal .rdp-nav button:hover {
+.travelthru-cal .rdp-nav button:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #f4f1e8;
 }
 
-.wanderza-cal .rdp-chevron {
+.travelthru-cal .rdp-chevron {
   fill: rgba(244, 241, 232, 0.6);
 }
 
-.wanderza-cal .rdp-nav button:hover .rdp-chevron {
+.travelthru-cal .rdp-nav button:hover .rdp-chevron {
   fill: #fbbf24;
 }
 
-.wanderza-cal .rdp-months {
+.travelthru-cal .rdp-months {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -123,7 +123,7 @@ body {
 }
 
 @media (max-width: 640px) {
-  .wanderza-cal .rdp-months {
+  .travelthru-cal .rdp-months {
     flex-direction: column;
   }
 }

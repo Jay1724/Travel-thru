@@ -9,7 +9,7 @@ import { format, differenceInCalendarDays, addDays } from "date-fns";
 import "react-day-picker/style.css";
 
 // ─────────────────────────────────────────────────────────────
-// WanderZA — AI trip planner MVP
+// Travel Thru — AI trip planner MVP
 // ─────────────────────────────────────────────────────────────
 
 const ZAR = (n) => "R" + n.toLocaleString("en-ZA");
@@ -137,7 +137,7 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
             <Plane size={18} className="text-[#0c1410]" />
           </div>
           <span style={{ fontFamily: "'Fraunces', serif" }} className="text-xl font-black tracking-tight">
-            Wander<span className="text-amber-400">ZA</span>
+            Travel <span className="text-amber-400">Thru</span>
           </span>
         </div>
         {stage === "results" && (
@@ -226,7 +226,7 @@ Give 3 items per day (Morning/Afternoon/Evening). Keep notes under 12 words. Be 
               </div>
 
               {showCal && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 wanderza-cal bg-[#182316] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 travelthru-cal bg-[#182316] border border-white/10 rounded-2xl p-4 shadow-2xl">
                   <DayPicker
                     mode="range"
                     selected={dateRange}
